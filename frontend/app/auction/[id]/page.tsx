@@ -43,8 +43,7 @@ const demoAuctionBase: AuctionBase = {
     { bidder: 'Yantra_AI', amount: 28, time: 'Just now' },
   ],
   status: 'active',
-  // Time will be set client-side to avoid hydration mismatch
-  offsetMs: 2 * 60 * 60 * 1000, // 2 hours from now
+  offsetMs: 2 * 60 * 60 * 1000,
   tags: ['Reflexion', 'Self-Improvement', 'LangChain'],
   preview: `class ReflexionAgent {
   async reflect(task: string) {
@@ -59,7 +58,6 @@ const demoAuctionBase: AuctionBase = {
 }`
 }
 
-// Helper to create demo auction with client-side time
 function createDemoAuction(id: number): AuctionData {
   return {
     ...demoAuctionBase,
@@ -78,12 +76,10 @@ export default function Auction({ params }: { params: { id: string } }) {
   const [bids, setBids] = useState<Bid[]>([])
   const [bidError, setBidError] = useState('')
 
-  // Wait for mount to avoid hydration mismatch
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Fetch auction data
   useEffect(() => {
     if (!mounted || !params?.id) return
 
@@ -114,7 +110,6 @@ export default function Auction({ params }: { params: { id: string } }) {
     fetchAuction()
   }, [params, mounted])
 
-  // Timer effect
   useEffect(() => {
     if (!auction?.endsAt || !mounted) return
 
@@ -202,16 +197,13 @@ export default function Auction({ params }: { params: { id: string } }) {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Back Link */}
       <Link href="/listings" className="inline-flex items-center gap-2 text-gray-500 hover:text-purple-600 mb-6 transition-colors">
         <ArrowLeft size={18} />
         Back to Listings
       </Link>
 
       <div className="grid lg:grid-cols-3 gap-8">
-        {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Title & Status */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200">
             <div className="flex flex-wrap items-center gap-2 mb-4">
               <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${
@@ -230,15 +222,11 @@ export default function Auction({ params }: { params: { id: string } }) {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{auction.title}</h1>
           </div>
 
-          {/* Description */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              📝 Description
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Description</h2>
             <p className="text-gray-600 leading-relaxed">{auction.description}</p>
           </div>
 
-          {/* Code Preview */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200">
             <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
               <Code size={20} className="text-purple-600" />
@@ -253,13 +241,10 @@ export default function Auction({ params }: { params: { id: string } }) {
             </p>
           </div>
 
-          {/* Seller Info */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              👤 Seller
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Seller</h2>
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center text-white text-2xl font-bold">
                 {auction.seller.name[0]}
               </div>
               <div>
@@ -271,10 +256,8 @@ export default function Auction({ params }: { params: { id: string } }) {
           </div>
         </div>
 
-        {/* Bidding Panel */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-2xl border border-gray-200 sticky top-24 overflow-hidden">
-            {/* Timer */}
             <div className={`p-6 text-center ${
               isEnded ? 'bg-gray-100' :
               isEndingSoon ? 'bg-gradient-to-r from-orange-50 to-red-50' :
@@ -290,16 +273,14 @@ export default function Auction({ params }: { params: { id: string } }) {
               </p>
             </div>
 
-            {/* Price */}
             <div className="p-6 border-b border-gray-100">
               <p className="text-sm text-gray-500 mb-1">💰 Current Bid</p>
-              <p className="text-4xl md:text-5xl font-bold price-highlight">{currentBid} CLAW</p>
+              <p className="text-4xl md:text-5xl font-bold text-purple-600">{currentBid} CLAW</p>
               <p className="text-sm text-gray-400 mt-1">
                 Starting: {auction.startingPrice} CLAW • Min: {auction.minBid} CLAW
               </p>
             </div>
 
-            {/* Bid Input */}
             <div className="p-6 border-b border-gray-100">
               {!isEnded ? (
                 <>
@@ -334,7 +315,6 @@ export default function Auction({ params }: { params: { id: string } }) {
               )}
             </div>
 
-            {/* Bid History */}
             <div className="p-6">
               <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 📊 Bid History
@@ -352,9 +332,7 @@ export default function Auction({ params }: { params: { id: string } }) {
                         <p className="text-xs text-gray-400">{bid.time}</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <span className="font-bold text-purple-600">{bid.amount} CLAW</span>
-                    </div>
+                    <span className="font-bold text-purple-600">{bid.amount} CLAW</span>
                   </div>
                 ))}
               </div>
