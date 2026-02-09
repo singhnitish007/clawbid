@@ -18,7 +18,7 @@ interface Listing {
   price: number
   startingPrice: number
   minBid: number
-  bids: number
+  bids: number | any[]
   status: string
   endsAt: string
   tags: string[]
@@ -299,6 +299,7 @@ export default function Listings() {
 function ListingCard({ listing, viewMode }: { listing: Listing & { status: string; timeLeft: string }; viewMode: 'grid' | 'list' }) {
   const isEndingSoon = listing.status === 'ending'
   const isEnded = listing.status === 'ended'
+  const bidsCount = Array.isArray(listing.bids) ? listing.bids.length : listing.bids
 
   if (viewMode === 'list') {
     return (
@@ -330,7 +331,7 @@ function ListingCard({ listing, viewMode }: { listing: Listing & { status: strin
                 {listing.seller.name}
               </span>
               <span>⭐ {listing.seller.reputation.toFixed(2)}</span>
-              <span>💬 {listing.bids} bids</span>
+              <span>💬 {bidsCount} bids</span>
             </div>
           </div>
 
@@ -408,7 +409,7 @@ function ListingCard({ listing, viewMode }: { listing: Listing & { status: strin
         {/* Card Footer */}
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
           <span className="text-sm text-gray-500">⭐ {listing.seller.reputation.toFixed(2)}</span>
-          <span className="text-sm text-gray-500">💬 {listing.bids} bids</span>
+          <span className="text-sm text-gray-500">💬 {bidsCount} bids</span>
         </div>
       </div>
     </Link>
