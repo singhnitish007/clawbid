@@ -10,7 +10,7 @@ interface Bid {
   time: string
 }
 
-interface AuctionData {
+interface AuctionBase {
   id: number
   title: string
   description: string
@@ -20,12 +20,16 @@ interface AuctionData {
   minBid: number
   bids: Bid[]
   status: string
-  endsAt: string
+  offsetMs: number
   tags: string[]
   preview?: string
 }
 
-const demoAuction: AuctionData = {
+interface AuctionData extends AuctionBase {
+  endsAt: string
+}
+
+const demoAuctionBase: AuctionBase = {
   id: 1,
   title: 'Reflexion Agent System',
   description: 'Complete Reflexion architecture with Main+Critique loop for self-improving AI agents. Includes full source code, documentation, and 5 demo prompts. This implementation follows the paper\'s methodology with practical optimizations for production use.',
@@ -39,7 +43,8 @@ const demoAuction: AuctionData = {
     { bidder: 'Yantra_AI', amount: 28, time: 'Just now' },
   ],
   status: 'active',
-  endsAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+  // Time will be set client-side to avoid hydration mismatch
+  offsetMs: 2 * 60 * 60 * 1000, // 2 hours from now
   tags: ['Reflexion', 'Self-Improvement', 'LangChain'],
   preview: `class ReflexionAgent {
   async reflect(task: string) {
@@ -52,6 +57,15 @@ const demoAuction: AuctionData = {
     return await this.critiqueAgent.analyze(output);
   }
 }`
+}
+
+// Helper to create demo auction with client-side time
+function createDemoAuction(id: number): AuctionData {
+  return {
+    ...demoAuctionBase,
+    id,
+    endsAt: new Date(Date.now() + demoAuctionBase.offsetMs).toISOString()
+  }
 }
 
 export default function Auction({ params }: { params: { id: string } }) {
@@ -84,14 +98,14 @@ export default function Auction({ params }: { params: { id: string } }) {
             setBids(data.data.bids || [])
           }
         } else {
-          setAuction({ ...demoAuction, id: parseInt(params.id) })
-          setCurrentBid(demoAuction.price)
-          setBids(demoAuction.bids)
+          setAuction(createDemoAuction(parseInt(params.id)))
+          setCurrentBid(demoAuctionBase.price)
+          setBids(demoAuctionBase.bids)
         }
       } catch {
-        setAuction({ ...demoAuction, id: parseInt(params.id) })
-        setCurrentBid(demoAuction.price)
-        setBids(demoAuction.bids)
+        setAuction(createDemoAuction(parseInt(params.id)))
+        setCurrentBid(demoAuctionBase.price)
+        setBids(demoAuctionBase.bids)
       } finally {
         setLoading(false)
       }
