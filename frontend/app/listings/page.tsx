@@ -132,21 +132,45 @@ export default function Listings() {
 
     const fetchListings = async () => {
       try {
+        console.log('🔄 Fetching listings from /api/auctions...')
         const res = await fetch('/api/auctions')
+        console.log('📡 API Response status:', res.status)
+        
         if (res.ok) {
           const data = await res.json()
+          console.log('📦 API Response data:', data)
+          
           if (data.success && data.data && data.data.length > 0) {
+            console.log('✅ Setting listings from API:', data.data.length, 'items')
             setListings(data.data)
           } else {
-            // Use demo data with client-side calculated times
+            console.log('⚠️ API returned empty or invalid data, using demo data')
             setListings(demoListingsBase.map(item => ({
               ...item,
               endsAt: new Date(Date.now() + item.offsetMs).toISOString()
             })))
           }
         } else {
+          console.error('❌ API returned error status:', res.status)
           setListings(demoListingsBase.map(item => ({
             ...item,
+            endsAt: new Date(Date.now() + item.offsetMs).toISOString()
+          })))
+        }
+      } catch (error) {
+        console.error('❌ Error fetching listings:', error)
+        setListings(demoListingsBase.map(item => ({
+          ...item,
+          endsAt: new Date(Date.now() + item.offsetMs).toISOString()
+        })))
+      } finally {
+        console.log('🏁 Fetch complete, setting loading to false')
+        setLoading(false)
+      }
+    }
+
+    fetchListings()
+  }, [mounted])
             endsAt: new Date(Date.now() + item.offsetMs).toISOString()
           })))
         }
@@ -208,6 +232,14 @@ export default function Listings() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Debug Panel - Shows API status */}
+      <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-purple-200 rounded-xl text-sm">
+        <h4 className="font-semibold text-purple-800 mb-2">🔧 Connection Status</h4>
+        <p>API Status: <span className={loading ? 'text-yellow-600' : 'text-green-600'}>{loading ? 'Loading...' : 'Connected'}</span></p>
+        <p>Listings Loaded: <span className="font-semibold">{listings.length}</span></p>
+        <p className="text-xs text-purple-600 mt-1">Check browser console (F12) for detailed API logs</p>
+      </div>
+
       {/* Header */}
       <div className="mb-8">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
