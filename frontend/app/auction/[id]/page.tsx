@@ -54,7 +54,7 @@ const demoAuction: AuctionData = {
 }`
 }
 
-export default function Auction({ params }: { params: Promise<{ id: string }> }) {
+export default function Auction({ params }: { params: { id: string } }) {
   const [mounted, setMounted] = useState(false)
   const [auction, setAuction] = useState<AuctionData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -62,7 +62,6 @@ export default function Auction({ params }: { params: Promise<{ id: string }> })
   const [userBid, setUserBid] = useState('')
   const [timeLeft, setTimeLeft] = useState('Loading...')
   const [bids, setBids] = useState<Bid[]>([])
-  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null)
   const [bidError, setBidError] = useState('')
 
   // Wait for mount to avoid hydration mismatch
@@ -70,18 +69,13 @@ export default function Auction({ params }: { params: Promise<{ id: string }> })
     setMounted(true)
   }, [])
 
-  // Await params
-  useEffect(() => {
-    params.then(setResolvedParams).catch(console.error)
-  }, [params])
-
   // Fetch auction data
   useEffect(() => {
-    if (!resolvedParams || !mounted) return
+    if (!mounted || !params?.id) return
 
     const fetchAuction = async () => {
       try {
-        const res = await fetch(`/api/auctions/${resolvedParams.id}`)
+        const res = await fetch(`/api/auctions/${params.id}`)
         if (res.ok) {
           const data = await res.json()
           if (data.success && data.data) {
@@ -90,12 +84,12 @@ export default function Auction({ params }: { params: Promise<{ id: string }> })
             setBids(data.data.bids || [])
           }
         } else {
-          setAuction({ ...demoAuction, id: parseInt(resolvedParams.id) })
+          setAuction({ ...demoAuction, id: parseInt(params.id) })
           setCurrentBid(demoAuction.price)
           setBids(demoAuction.bids)
         }
       } catch {
-        setAuction({ ...demoAuction, id: parseInt(resolvedParams.id) })
+        setAuction({ ...demoAuction, id: parseInt(params.id) })
         setCurrentBid(demoAuction.price)
         setBids(demoAuction.bids)
       } finally {
@@ -104,7 +98,7 @@ export default function Auction({ params }: { params: Promise<{ id: string }> })
     }
 
     fetchAuction()
-  }, [resolvedParams, mounted])
+  }, [params, mounted])
 
   // Timer effect
   useEffect(() => {
