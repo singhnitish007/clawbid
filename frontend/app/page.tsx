@@ -252,25 +252,29 @@ function StepCard({ number, icon, title, description, gradient, delay }: {
 function AuctionCard({ auction }: { auction: Auction }) {
   const status = auction.status === 'active' ? 'active' : auction.status === 'ending' ? 'ending' : 'ended'
   const isEndingSoon = status === 'ending'
+  
+  // Status configuration
+  const statusConfig = {
+    active: { badge: 'bg-green-100 text-green-700', border: 'border-green-200 hover:border-green-400', icon: '🟢 Active' },
+    ending: { badge: 'bg-orange-100 text-orange-700', border: 'border-orange-300 hover:border-orange-500', icon: '🔥 Hot' },
+    ended: { badge: 'bg-gray-100 text-gray-600', border: 'border-gray-200 hover:border-gray-400', icon: '⚫ Ended' }
+  }
+  
+  const currentStatus = statusConfig[status]
 
   return (
     <Link href={`/auction/${auction.id}`}>
-      <div className={`bg-white rounded-2xl p-6 border-2 card-hover cursor-pointer ${
-        status === 'active' ? 'border-purple-200 hover:border-purple-400' :
-        status === 'ending' ? 'border-orange-300 hover:border-orange-500' :
-        'border-gray-200 hover:border-gray-400'
-      }`}>
+      <div className={`bg-white rounded-2xl p-6 border-2 card-hover cursor-pointer transition-all duration-200 hover:shadow-xl hover:-translate-y-1 ${currentStatus.border}`}>
         <div className="flex justify-between items-start mb-4">
-          <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${
-            status === 'active' ? 'bg-green-100 text-green-700' :
-            status === 'ending' ? 'bg-orange-100 text-orange-700' :
-            'bg-gray-100 text-gray-600'
-          }`}>
-            {status === 'active' ? '🟢 Active' : status === 'ending' ? '🔥 Hot' : '⚫ Ended'}
+          <span className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${currentStatus.badge}`}>
+            {currentStatus.icon}
           </span>
-          <span className="text-sm text-gray-500 flex items-center gap-1">
-            👤 {auction.seller.name}
-          </span>
+          <div className="flex items-center gap-1.5 text-sm text-gray-500 bg-gray-50 px-2 py-1 rounded-lg">
+            <div className="w-5 h-5 bg-gradient-to-br from-purple-100 to-purple-200 rounded flex items-center justify-center">
+              <Bot size={12} className="text-purple-600" />
+            </div>
+            {auction.seller.name}
+          </div>
         </div>
 
         <h3 className="font-bold text-lg text-gray-800 mb-2 line-clamp-2">{auction.title}</h3>
@@ -278,12 +282,19 @@ function AuctionCard({ auction }: { auction: Auction }) {
         <div className="flex justify-between items-end pt-4 border-t border-gray-100">
           <div>
             <p className="text-sm text-gray-500">Current Bid</p>
-            <p className="text-2xl font-bold price-highlight">{auction.price} CLAW</p>
+            <p className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent">{auction.price} CLAW</p>
           </div>
           <div className="text-right">
             <p className="text-sm text-gray-500">💬 {auction.bids} bids</p>
           </div>
         </div>
+
+        {/* Timer bar for active/ending auctions */}
+        {status !== 'ended' && (
+          <div className={`h-1 mt-4 rounded-full ${
+            isEndingSoon ? 'bg-orange-400' : 'bg-green-500'
+          }`} style={{ width: '100%' }} />
+        )}
       </div>
     </Link>
   )
