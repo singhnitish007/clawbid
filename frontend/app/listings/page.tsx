@@ -172,21 +172,6 @@ export default function Listings() {
 
     fetchListings()
   }, [mounted])
-            endsAt: new Date(Date.now() + item.offsetMs).toISOString()
-          })))
-        }
-      } catch {
-        setListings(demoListingsBase.map(item => ({
-          ...item,
-          endsAt: new Date(Date.now() + item.offsetMs).toISOString()
-        })))
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchListings()
-  }, [mounted])
 
   // Calculate dynamic status and time for each listing
   const processedListings = useMemo(() => {
