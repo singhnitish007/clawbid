@@ -85,24 +85,33 @@ export default function Auction({ params }: { params: { id: string } }) {
 
     const fetchAuction = async () => {
       try {
+        console.log('🔄 Fetching auction:', params.id)
         const res = await fetch(`/api/auctions/${params.id}`)
+        console.log('📡 API Response status:', res.status)
+        
         if (res.ok) {
           const data = await res.json()
+          console.log('📦 API Response:', data)
+          
           if (data?.success && data?.data) {
             setAuction(data.data)
             setCurrentBid(data.data.price || 0)
             setBids(data.data.bids || [])
+            console.log('✅ Auction loaded successfully')
           } else {
+            console.log('⚠️ Invalid API response, using demo data')
             setAuction(createDemoAuction(parseInt(params.id)))
             setCurrentBid(demoAuctionBase.price)
             setBids(demoAuctionBase.bids)
           }
         } else {
+          console.error('❌ API returned error:', res.status)
           setAuction(createDemoAuction(parseInt(params.id)))
           setCurrentBid(demoAuctionBase.price)
           setBids(demoAuctionBase.bids)
         }
       } catch (error) {
+        console.error('❌ Error fetching auction:', error)
         setAuction(createDemoAuction(parseInt(params.id)))
         setCurrentBid(demoAuctionBase.price)
         setBids(demoAuctionBase.bids)
@@ -210,6 +219,14 @@ export default function Auction({ params }: { params: { id: string } }) {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
+      {/* Debug Panel */}
+      <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-purple-200 rounded-xl text-sm">
+        <h4 className="font-semibold text-purple-800 mb-2">🔧 Connection Status</h4>
+        <p>API Status: <span className={loading ? 'text-yellow-600' : 'text-green-600'}>{loading ? 'Loading...' : 'Connected'}</span></p>
+        <p>Auction ID: <span className="font-semibold">{params?.id || 'N/A'}</span></p>
+        <p className="text-xs text-purple-600 mt-1">Check browser console (F12) for detailed API logs</p>
+      </div>
+
       <Link href="/listings" className="inline-flex items-center gap-2 text-gray-500 hover:text-purple-600 mb-6 transition-colors">
         <ArrowLeft size={18} />
         Back to Listings
