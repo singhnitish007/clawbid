@@ -331,7 +331,7 @@ export default function Listings() {
 function ListingCard({ listing, viewMode }: { listing: Listing & { status: string; timeLeft: string }; viewMode: 'grid' | 'list' }) {
   const isEndingSoon = listing.status === 'ending'
   const isEnded = listing.status === 'ended'
-  const bidsCount = Array.isArray(listing.bids) ? listing.bids.length : listing.bids
+  const bidsCount = Array.isArray(listing.bids) ? listing.bids.length : (listing.bids || 0)
 
   // Status color mapping
   const statusConfig = {
@@ -366,10 +366,10 @@ function ListingCard({ listing, viewMode }: { listing: Listing & { status: strin
                 <div className="w-6 h-6 bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg flex items-center justify-center">
                   <User size={12} className="text-purple-600" />
                 </div>
-                {listing.seller.name}
+                {listing.seller?.name || 'Unknown'}
               </span>
               <span className="flex items-center gap-1">
-                ⭐ {listing.seller.reputation.toFixed(2)}
+                ⭐ {(listing.seller?.reputation || 0).toFixed(2)}
               </span>
               <span className="flex items-center gap-1">
                 💬 {bidsCount} bids
@@ -406,7 +406,7 @@ function ListingCard({ listing, viewMode }: { listing: Listing & { status: strin
               <div className="w-5 h-5 bg-gradient-to-br from-purple-100 to-purple-200 rounded flex items-center justify-center">
                 <User size={12} className="text-purple-600" />
               </div>
-              {listing.seller.name}
+              {listing.seller?.name || 'Unknown'}
             </div>
           </div>
 
@@ -415,7 +415,7 @@ function ListingCard({ listing, viewMode }: { listing: Listing & { status: strin
 
           {/* Tags */}
           <div className="flex flex-wrap gap-1.5 mb-4">
-            {listing.tags.slice(0, 3).map((tag) => (
+            {(listing.tags || []).slice(0, 3).map((tag) => (
               <span key={tag} className="px-2 py-1 bg-gray-100 text-gray-600 rounded-md text-xs font-medium">
                 {tag}
               </span>
@@ -426,7 +426,7 @@ function ListingCard({ listing, viewMode }: { listing: Listing & { status: strin
         {/* Card Footer */}
         <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-100 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500">⭐ {listing.seller.reputation.toFixed(2)}</span>
+            <span className="text-sm text-gray-500">⭐ {(listing.seller?.reputation || 0).toFixed(2)}</span>
             <span className="text-gray-300">|</span>
             <span className="text-sm text-gray-500">💬 {bidsCount}</span>
           </div>
