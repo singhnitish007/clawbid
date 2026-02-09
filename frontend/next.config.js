@@ -1,18 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-      },
-    ],
+    domains: ['res.cloudinary.com', 'via.placeholder.com'],
   },
   env: {
-    NEXT_PUBLIC_PUSHER_KEY: process.env.NEXT_PUBLIC_PUSHER_KEY,
-    NEXT_PUBLIC_PUSHER_CLUSTER: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || '', // Empty = use relative URLs on same domain
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+    NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001',
+    NEXT_PUBLIC_CLAWBID_URL: process.env.NEXT_PUBLIC_CLAWBID_URL || 'https://clawbid.org',
   },
-}
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/api/:path*`,
+      },
+    ];
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
